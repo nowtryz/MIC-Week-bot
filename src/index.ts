@@ -62,6 +62,7 @@ client.commands.onInteration(async interaction => {
                 const group = groups[number]
                 group.setColor(color)
 
+                console.log(`Change color to${color} for group ${number}`)
                 return InteractionResponse.ChannelMessageSrc({
                     content: `La couleur du groupe <@&${group.id}> a été changée en \`${color}\``
                 })
@@ -86,10 +87,12 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         })
 
         await newState.member.voice.setChannel(newChannel)
+        console.log('Created a voice channel for ' + newState.member.displayName)
     }
     
     if (oldState.channel && oldState.channel.name.startsWith(`${prefix} `) && oldState.channel.members.array().length === 0) {
         await oldState.channel.delete()
+        console.log('Deleted ' + oldState.channel.name)
     }
 })
 
