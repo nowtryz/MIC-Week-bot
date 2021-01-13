@@ -91,8 +91,9 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     }
     
     if (oldState.channel && oldState.channel.name.startsWith(`${prefix} `) && oldState.channel.members.array().length === 0) {
+        const channelName = oldState.channel.name
         await oldState.channel.delete()
-        console.log('Deleted ' + oldState.channel.name)
+        console.log('Deleted ' + channelName)
     }
 })
 
