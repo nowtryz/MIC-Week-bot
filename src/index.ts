@@ -42,36 +42,55 @@ client.on('ready', async () => {
         type: 'PLAYING',
         name: '/color'
     })
+});
 
-    // bot new command
-    client.commands.onInteration(async interaction => {
-        if (interaction.data?.name === "color" && interaction.data?.options !== undefined) {
-            const value = interaction.data.options[0].value
-            console.log(value)
+// bot new command
+client.commands.onInteration(async interaction => {
+    if (interaction.data?.name === "color" && interaction.data?.options !== undefined) {
+        const value = interaction.data.options[0].value
+        console.log(value)
 
-            if(/#[0-9a-f]{6}/i.test(value)) {
-                const color = value.toLowerCase().match(/#[0-9a-f]{6}/)[0]
-                const match = interaction.channel.parent?.name.match(groupRegex)
+        if(/#[0-9a-f]{6}/i.test(value)) {
+            const color = value.toLowerCase().match(/#[0-9a-f]{6}/)[0]
+            const match = interaction.channel.parent?.name.match(groupRegex)
 
-                console.log('match')
-        
-                if (match) {
-                    const groups = getGroups(interaction.guild)
-                    const number = getGroupNumber(interaction.channel.parent)
-                    const group = groups[number]
-                    group.setColor(color)
+            console.log('match')
+    
+            if (match) {
+                const groups = getGroups(interaction.guild)
+                const number = getGroupNumber(interaction.channel.parent)
+                const group = groups[number]
+                group.setColor(color)
 
-                    return InteractionResponse.ChannelMessageSrc({
-                        content: `La couleur du groupe <@&${group.id}> a été changée en \`${color}\``
-                    })
-                } else return InteractionResponse.ChannelMessageSrc({
-                    content: `<@!${interaction.member.id}>, tu dois éxécuter cette commande dans un des salons de ton équipe`
+                return InteractionResponse.ChannelMessageSrc({
+                    content: `La couleur du groupe <@&${group.id}> a été changée en \`${color}\``
                 })
             } else return InteractionResponse.ChannelMessageSrc({
-                content: `\`${value}\` n'est pas une couleur correcte`
+                content: `<@!${interaction.member.id}>, tu dois éxécuter cette commande dans un des salons de ton équipe`
             })
-        }
-    })
-});
+        } else return InteractionResponse.ChannelMessageSrc({
+            content: `\`${value}\` n'est pas une couleur correcte`
+        })
+    }
+})
+
+// On join a creation vocal
+const prefix = '🔉'
+
+client.on('voiceStateUpdate', async (oldState, newState) => {
+    if (newState.channel && newState.channel.name.toLocaleLowerCase().includes('créer')) {
+        // join
+        const newChannel = await newState.guild.channels.create(`${prefix} ${newState.member.nickname || newState.member.displayName}`, {
+            type: 'voice',
+            parent: newState.channel.parent,
+        })
+
+        await newState.member.voice.setChannel(newChannel)
+    }
+    
+    if (oldState.channel && oldState.channel.name.startsWith(`${prefix} `) && oldState.channel.members.array().length === 0) {
+        await oldState.channel.delete()
+    }
+})
 
 client.login(process.env.BOT_TOKEN)
