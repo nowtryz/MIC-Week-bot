@@ -49,8 +49,8 @@ client.on('ready', async () => {
             const value = interaction.data.options[0].value
             console.log(value)
 
-            if(/#[0-9a-f]{6}/.test(value)) {
-                const color = value.match(/#[0-9a-f]{6}/)[1]
+            if(/#[0-9a-f]{6}/i.test(value)) {
+                const color = value.toLowerCase().match(/#[0-9a-f]{6}/)[0]
                 const match = interaction.channel.parent?.name.match(groupRegex)
 
                 console.log('match')
